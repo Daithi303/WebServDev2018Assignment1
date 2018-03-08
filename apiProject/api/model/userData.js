@@ -8,7 +8,7 @@ const users = [
   "streetAddress2": "Adam Estate",
   "townCity": "Adam Town",
   "countyState": "County Adam",
-  "email": "adam@amaill.com",
+  "email": "adam@amail.com",
   "userName": "adam101",
   "password": "adamPword"
 },
@@ -19,7 +19,7 @@ const users = [
   "streetAddress2": "Barry Estate",
   "townCity": "Barry Town",
   "countyState": "County Barry",
-  "email": "barry@bmaill.com",
+  "email": "barry@bmail.com",
   "userName": "barry101",
   "password": "barryPword"
 }

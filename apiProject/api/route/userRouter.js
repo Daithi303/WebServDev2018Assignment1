@@ -12,8 +12,8 @@ router.get('/', (req, res) => {
 });
 
 //Get a user
-router.get('/:id', (req, res) => {
-  Model.User.findById(req.params.id, (err, user) => {
+router.get('/:userId', (req, res) => {
+  Model.User.findById(req.params.userId, (err, user) => {
     if (err) return handleError(res, err);
     return res.status(200).json(user);
   });
@@ -28,10 +28,12 @@ router.post('/', (req, res) => {
 });
 
 
+
+
 // Update a user
-router.put('/:id', (req, res) => {
+router.put('/:userId', (req, res) => {
   if (req.body._id) delete req.body._id;
-  Model.User.findById(req.params.id, (err, user) => {
+  Model.User.findById(req.params.userId, (err, user) => {
     if (err) return handleError(res, err);
     if (!user) return res.send(404);
     const updated = _.merge(user, req.body);
@@ -43,8 +45,8 @@ router.put('/:id', (req, res) => {
 });
 
 // Delete a user
-router.delete('/:id', (req, res) => {
-  Model.User.findById(req.params.id, (err, user) => {
+router.delete('/:userId', (req, res) => {
+  Model.User.findById(req.params.userId, (err, user) => {
     if (err) return handleError(res, err);
     if (!user) return res.send(404);
     user.remove(function(err) {
