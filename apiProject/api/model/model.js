@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import randToken from 'rand-token';
+import crypto from 'crypto';
 const Schema = mongoose.Schema;
+
 import arrayUniquePlugin from 'mongoose-unique-array';
 var emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
 
@@ -137,11 +139,44 @@ const UserSchema = new Schema({
   type: String,
   required: true
   },
-  password: {
+  hashedPassword: {
   type: String,
   required: true
-  }
+  },
+  salt: {
+        type: String,
+        required: true
+    },
+	admin: {
+		type: Boolean,
+		required: true,
+		default: false
+	}
 });
+
+UserSchema.virtual('password')
+    .set(function (password) {
+		//this.salt = crypto.randomBytes(32).toString('base64');
+        this.salt = "aHNkNzM1MzkzZ2RoZDkzNzNnZWk4ZGhlOTkyODNnZGs=";
+        this.hashedPassword = this.encryptPassword(password, this.salt);
+    })
+    .get(function () {
+        return this.hashedPassword;
+    });
+
+UserSchema.methods.encryptPassword = function (password, salt) {
+    return crypto.createHmac('sha1', salt).update(password).digest('hex');
+};
+
+/*
+UserSchema.methods.checkPassword = function (password) {
+return "inside checkPassword method: "+ password;
+};
+*/
+
+UserSchema.methods.checkPassword = function (password) {
+    return this.encryptPassword(password, this.salt) === this.hashedPassword;
+};
 
 var User = mongoose.model('User', UserSchema);
 

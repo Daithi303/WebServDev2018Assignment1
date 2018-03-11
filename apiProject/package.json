@@ -18,8 +18,10 @@
   },
   "dependencies": {
     "body-parser": "^1.18.2",
+    "crypto": "^1.0.1",
     "dotenv": "^5.0.1",
     "express": "^4.16.2",
+    "jsonwebtoken": "^8.2.0",
     "lodash": "^4.17.5",
     "mongoose": "^5.0.8",
     "mongoose-unique-array": "^0.2.0",

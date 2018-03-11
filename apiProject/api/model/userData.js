@@ -10,7 +10,9 @@ const users = [
   "countyState": "County Adam",
   "email": "adam@amail.com",
   "userName": "adam101",
-  "password": "adamPword"
+  "hashedPassword": "85b412c53bb2059acef04832158b84f2736e00f8",
+  "salt": "aHNkNzM1MzkzZ2RoZDkzNzNnZWk4ZGhlOTkyODNnZGs=",
+	"admin": true
 },
     {
   "fName": "Barry",
@@ -21,7 +23,9 @@ const users = [
   "countyState": "County Barry",
   "email": "barry@bmail.com",
   "userName": "barry101",
-  "password": "barryPword"
+  "hashedPassword": "c5c882513e18029989bf333f21a326acb98e54f2",
+  "salt": "aHNkNzM1MzkzZ2RoZDkzNzNnZWk4ZGhlOTkyODNnZGs=",
+  "admin": false
 }
 ];
 

@@ -1,8 +1,43 @@
 import express from 'express';
 import Model from './../model/model.js';
 import _ from 'lodash';
+import jwt from 'jsonwebtoken';
 const router = express.Router(); // eslint-disable-line
+var server = null;
 
+function init(serverIn) {
+  server = serverIn;
+ // console.log('userRouter.init server.get value: '+ server.get('superSecret'))
+};
+
+router.use(
+function(req, res, next) {
+  // check header or url parameters or post parameters for token
+  var token = req.headers['x-access-token'];
+  if (token) {
+	 // console.log("token: "+token);
+	  var secret = server.get('superSecret');
+	  //console.log("secret: "+secret);
+    jwt.verify(token, secret, function(err, decoded) {      
+      if (err) {
+        return res.json({ success: false, message: 'Failed to authenticate token.' });   	
+      } else {
+        // if everything is good, save to request for use in other routes
+        req.decoded = decoded;    
+        next();
+      }
+    });
+
+  } else {
+    // if there is no token
+    // return an error
+    return res.status(403).send({ 
+        success: false, 
+        message: 'No token provided.' 
+    });
+  }
+}
+);
 //Get all users
 router.get('/', (req, res) => {
   Model.User.find((err, user) => {
@@ -66,4 +101,10 @@ function handleError(res, err) {
   return res.send(500, err);
 };
 
-export default router;
+
+module.exports = {
+	router: router,
+	init: init	
+};
+
+//export default router;

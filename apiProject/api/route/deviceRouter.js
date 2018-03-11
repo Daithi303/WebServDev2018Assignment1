@@ -1,8 +1,43 @@
 import express from 'express';
 import Model from './../model/model.js';
 import _ from 'lodash';
+import jwt from 'jsonwebtoken';
 const router = express.Router(); // eslint-disable-line
+var server = null;
 
+function init(serverIn) {
+  server = serverIn;
+  //console.log('deviceRouter.init server.get value: '+ server.get('superSecret'))
+};
+
+router.use(
+function(req, res, next) {
+  // check header or url parameters or post parameters for token
+  var token = req.headers['x-access-token'];
+  // decode token
+  if (token) {
+
+    // verifies secret and checks exp
+    jwt.verify(token, server.get('superSecret'), function(err, decoded) {      
+      if (err) {
+        return res.json({ success: false, message: 'Failed to authenticate token.' });    
+      } else {
+        // if everything is good, save to request for use in other routes
+        req.decoded = decoded;    
+        next();
+      }
+    });
+
+  } else {
+    // if there is no token
+    // return an error
+    return res.status(403).send({ 
+        success: false, 
+        message: 'No token provided.' 
+    });
+  }
+}
+);
 //Get all devices
 router.get('/', (req, res) => {
   Model.Device.find((err, device) => {
@@ -33,7 +68,7 @@ router.put('/:deviceId/registeredUser', (req, res) => {
   if (req.body._id) delete req.body._id;
   Model.Device.findById(req.params.deviceId, (err, device) => {
     if (err) return handleError(res, err);
-    if (!device) return res.send(404);
+    if (!device) return res.status(404).json({Device: "Not found"});
     const updated = _.merge(device, req.body);
     updated.save((err) => {
       if (err) return handleError(res, err);
@@ -47,7 +82,7 @@ router.get('/:deviceId/registeredUser', (req, res) => {
   if (req.body._id) delete req.body._id;
   Model.Device.findById(req.params.deviceId, (err, device) => {
     if (err) return handleError(res, err);
-    if (!device) return res.send(404);
+    if (!device) return res.status(404).json({Device: "Not found"});
 	if(device.registeredUser == null){
 		return res.status(404).json({registeredUser: null});
 	}
@@ -120,4 +155,7 @@ function handleError(res, err) {
   return res.send(500, err);
 };
 
-export default router;
+module.exports = {
+	router: router,
+	init: init	
+};
