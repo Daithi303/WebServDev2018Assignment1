@@ -2,6 +2,7 @@ import express from 'express';
 import Model from './../model/model.js';
 import _ from 'lodash';
 import jwt from 'jsonwebtoken';
+import json2xml from 'json2xml';
 const router = express.Router(); // eslint-disable-line
 var server = null;
 
@@ -38,14 +39,66 @@ function(req, res, next) {
   }
 }
 );
+
+
 //Get all users
+/*
 router.get('/', (req, res) => {
   Model.User.find((err, user) => {
     if (err) return handleError(res, err);
     return res.status(200).json(user);
   });
 });
+*/
 
+router.get('/:userId', (req, res) => {
+  Model.User.findById(req.params.userId, (err, user) => {
+    if (err) return handleError(res, err);
+    res.format({
+		'application/xml': function(){
+			console.log('application/XML');
+			var userObj = user.toObject();
+			console.log('userObj: '+userObj);
+			var response = json2xml({user: userObj});
+			console.log('response xml: '+response);
+			return res.status(200).send(response);
+		},
+		'default': function(){
+			console.log('default');
+			return res.status(200).json(user);
+		}
+		
+	});
+  });
+});
+
+router.get('/', (req, res) => {
+  Model.User.find((err, users) => {
+    if (err) return handleError(res, err);
+	
+    res.format({
+		'application/xml': function(){
+			var response = '';
+			var userObj = null;
+			console.log('application/XML');
+			users.forEach(function(element) {
+  console.log('Each userName: '+element.userName);
+  userObj = element.toObject();
+  response = response + json2xml({user: userObj});
+});
+			return res.status(200).send('<users>'+response+'</users>');
+		},
+		'default': function(){
+			console.log('default');
+			return res.status(200).json(users);
+		}
+		
+	});
+  });
+});
+
+
+/*
 //Get a user
 router.get('/:userId', (req, res) => {
   Model.User.findById(req.params.userId, (err, user) => {
@@ -53,6 +106,7 @@ router.get('/:userId', (req, res) => {
     return res.status(200).json(user);
   });
 });
+*/
 
 //Add a user
 router.post('/', (req, res) => {

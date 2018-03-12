@@ -2,6 +2,7 @@ import express from 'express';
 import Model from './../model/model.js';
 import _ from 'lodash';
 import jwt from 'jsonwebtoken';
+import json2xml from 'json2xml';
 const router = express.Router(); // eslint-disable-line
 var server = null;
 
@@ -38,6 +39,51 @@ function(req, res, next) {
   }
 }
 );
+
+router.get('/:deviceId', (req, res) => {
+  Model.Device.findById(req.params.deviceId, (err, device) => {
+    if (err) return handleError(res, err);
+    res.format({
+		'application/xml': function(){
+			console.log('application/XML');
+			var deviceObj = device.toObject();
+			console.log('deviceObj: '+deviceObj);
+			var response = json2xml({device: deviceObj});
+			console.log('response xml: '+response);
+			return res.status(200).send(response);
+		},
+		'default': function(){
+			console.log('default');
+			return res.status(200).json(device);
+		}
+	});
+  });
+});
+
+router.get('/', (req, res) => {
+  Model.Device.find((err, devices) => {
+    if (err) return handleError(res, err);
+    res.format({
+		'application/xml': function(){
+			var response = '';
+			var deviceObj = null;
+			console.log('application/XML');
+			devices.forEach(function(element) {
+  deviceObj = element.toObject();
+  response = response + json2xml({device: deviceObj});
+});
+			return res.status(200).send('<device>'+response+'</device>');
+		},
+		'default': function(){
+			console.log('default');
+			return res.status(200).json(devices);
+		}		
+	});
+  });
+});
+
+
+/*
 //Get all devices
 router.get('/', (req, res) => {
   Model.Device.find((err, device) => {
@@ -53,6 +99,7 @@ router.get('/:deviceId', (req, res) => {
     return res.status(200).json(device);
   });
 });
+*/
 
 //Add a device
 router.post('/', (req, res) => {

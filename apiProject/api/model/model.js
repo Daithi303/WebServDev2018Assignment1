@@ -131,9 +131,9 @@ const UserSchema = new Schema({
   lowercase: true
   },
   dateOfBirth: {
-    type: Date,
+    type: String,
 	required: true,
-	default: Date.now
+	default: '12/12/90'
   },
   userName: {
   type: String,
