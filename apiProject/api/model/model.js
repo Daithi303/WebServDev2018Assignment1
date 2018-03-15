@@ -2,23 +2,28 @@ import mongoose from 'mongoose';
 import randToken from 'rand-token';
 import crypto from 'crypto';
 const Schema = mongoose.Schema;
-
+import moment from 'moment';
 import arrayUniquePlugin from 'mongoose-unique-array';
-var emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
 
 const JourneySchema = new Schema(
 {
 	initiator: {
-		type: Schema.Types.ObjectId, ref: 'User',
+		type: Schema.Types.ObjectId, 
+		ref: 'User',
 		required: true
 	},
 	startDateTime: {
-		type : Date, 
-		default: Date.now 
+		type : String, 
+		default: function(){
+			return moment().format('MMMM Do YYYY, h:mm:ss a');
+		} 
 	},
 	finishDateTime: {
-		type : Date, 
-		default: Date.now 
+		type : String, 
+		default: function(){
+			return null;rs
+			
+		} 
 	},
 	journeyState: {
 		type: String,
@@ -52,7 +57,7 @@ const DeviceSchema = new Schema({
 		type: Number,
 		default:5
 	},
-  registeredUser: { 
+  registeredOwner: { 
   type: Schema.Types.ObjectId,
   ref: 'User'
   },
@@ -133,7 +138,7 @@ const UserSchema = new Schema({
   dateOfBirth: {
     type: String,
 	required: true,
-	default: '12/12/90'
+	default: function(){return moment().format('MMMM Do YYYY');}
   },
   userName: {
   type: String,
@@ -168,38 +173,17 @@ UserSchema.methods.encryptPassword = function (password, salt) {
     return crypto.createHmac('sha1', salt).update(password).digest('hex');
 };
 
-/*
-UserSchema.methods.checkPassword = function (password) {
-return "inside checkPassword method: "+ password;
-};
-*/
-
 UserSchema.methods.checkPassword = function (password) {
     return this.encryptPassword(password, this.salt) === this.hashedPassword;
 };
 
-var User = mongoose.model('User', UserSchema);
 
-/*
-UserSchema.path('registeredDevices').validate({
-  isAsync: true,
-  validator: function (value, respond) {
-	  var lastEntry = value.length-1;
-	  console.log("Value: "+ value[lastEntry]);
-  Device.findOne({_id: value[lastEntry]}, function(err, user) {
-    if(err) throw err;
-    if(user) {
-		console.log("User Found");
-		return respond(true);}
-	else{
-    console.log("User NOT Found");
-    respond(false);
-	}
-  });
-  },
-  message: 'That device does not exist.' // Optional
-});
-*/
+UserSchema.path('email').validate(function (email) {
+   var emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+   return emailRegex.test(email); 
+}, 'The e-mail field cannot be empty.')
+
+var User = mongoose.model('User', UserSchema);
 
 module.exports = {
 	Device: Device,

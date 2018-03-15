@@ -12,14 +12,14 @@ import jwt from 'jsonwebtoken';
 
 dotenv.config();
 mongoose.connect(process.env.mongoDB);
-// Populate DB with sample data
+
 if (process.env.seedDb) {
   loadUsers();
   loadDevices();
 }
+
 const port = process.env.PORT;
 var server = express();
-//const authenticateRouter = express.Router();
 server.set('superSecret', process.env.jwtSecret);
 userRouter.init(server);
 deviceRouter.init(server);
@@ -29,8 +29,6 @@ server.use(bodyParser.json());
 server.use('/api/authenticate', authenticateRouter.router);
 server.use('/api/user', userRouter.router);
 server.use('/api/device', deviceRouter.router);
-//server.use(express.static('public'));
 
 server.listen(port);
-// Put a friendly message on the terminal
 console.log(`Server running at ${port}`);
