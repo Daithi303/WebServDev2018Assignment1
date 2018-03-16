@@ -7,28 +7,31 @@ This project provides an API for the back-end required for my 4th year project. 
 This API will provide the middleware which will allow users of the mobile application and the web application to access the mongodb back-end.
 For this assignment the mongo database will have the following collection structure:
 
-//////////////////////////////////////////////////////////////////|          //////////////////////////////////////////////////////////////////////////////////////////|
-|                       USER DOC                         |          |                                 DEVICE DOC                                    |
-|    |/////////////////////////////////////////////////////|       |          |    |/////////////////////////////////////////////////////////////////////////////|       | 
-|    |                     USER                       |       |          |    |                               DEVICE                                  |       |   
-|    |   fName                                        |       |          |    |      deviceName                                                   |       | 
-|    |   Name                                         |       |          |    |      minTempWarning                                            |       | 
-|    |   streetAddress1                         |       |          |    |      maxTempWarning                                          |       | 
-|    |   streetAddress2                         |       |          |    |      minutesToWaitBeforeSecondaryAlert           |       | 
-|    |   townCity                                    |       |          |    |      minutesAllowedForJourneyPause                 |       | 
-|    |   countryState                              |       |          |    |       registeredOwner    (USER _id)                     |       | 
-|    |   email                                           |       |          |    |                                                                             |       | 
-|    |   userName                                  |       |          |    |        /////////////////////////////////////////////////////////////         |       | 
-|    |   dateOfBirth                                |       |          |    |        |                     JOURNEY                       |         |       | 
-|    |   hashedPassword                      |       |          |    |        |     initiator (USER _id)                         |         |       | 
-|    |   salt                                             |       |          |    |        |     startDateTime                                |          |      | 
-|    |   salt                                             |       |          |    |        |     finishDateTime                               |          |      | 
-|    |                                                     |       |          |    |         |      journeyState                                 |         |       | 
-|    |/////////////////////////////////////////////////////        |          |    |         |///////////////////////////////////////////////////////////|         |       |   
-|                                                                 |           |    |                                                                              |       | 
-|/////////////////////////////////////////////////////////////////|           |    |//////////////////////////////////////////////////////////////////////////////|       |
-                                                                             |                                                                                           |
-																	 		 |///////////////////////////////////////////////////////////////////////////////////////////|
+USER COLLECTION
+fName
+lName
+streetAddress1
+streetAddress2
+townCity
+countryState
+email
+dateOfBirth
+hashedPassword
+salt
+
+DEVICE COLLECTION
+deviceName
+minTempWarning
+maxTempWarning
+minutesToWaitBeforeSecondaryAlert
+minutesAllowedForJourneyPause
+registeredOwner    (USER _id)   
+
+JOURNEY (sub-document of DEVICE COLLECTION)
+ initiator (USER _id)  
+startDateTime
+finishDateTime
+journeyState
 																		
 As can be seenfrom the above collection structure there are 2 main collections: USER & DEVICE. Within DEVICE there is a sub-document of type JOURNEY. A device will have one and only one registered owner, which relates to an existing user. Each device can contain many journeys. Each Journey will have an initiator property relating to an existing user.
 
