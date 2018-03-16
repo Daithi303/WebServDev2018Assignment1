@@ -101,6 +101,8 @@ router.get('/', (req, res) => {
 
 //Add a user
 router.post('/', (req, res) => {
+   if (req.body._id) delete req.body._id;
+   if (req.body.hashedPassword) {delete req.body.hashedPassword;}
   Model.User.create(req.body, function(err, user) {
     if (err) return handleError(res, err);
     return res.status(201).send(convertAndFormatMongooseObjectToPlainObject(user));
@@ -129,7 +131,7 @@ router.delete('/:userId', (req, res) => {
     if (!user) return res.send(404);
     user.remove(function(err) {
       if (err) return handleError(res, err);
-      return res.send(204);
+      return res.status(200).json({message: "User deleted"});
     });
   });
 });
