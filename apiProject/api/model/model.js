@@ -150,7 +150,7 @@ const UserSchema = new Schema({
   },
   salt: {
         type: String,
-        required: true
+        default: "aHNkNzM1MzkzZ2RoZDkzNzNnZWk4ZGhlOTkyODNnZGs="
     },
 	admin: {
 		type: Boolean,

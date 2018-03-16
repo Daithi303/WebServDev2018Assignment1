@@ -110,6 +110,7 @@ router.post('/', (req, res) => {
 // Update a user
 router.put('/:userId', (req, res) => {
   if (req.body._id) delete req.body._id;
+   if (req.body.hashedPassword) {delete req.body.hashedPassword;}
   Model.User.findById(req.params.userId, (err, user) => {
     if (err) return handleError(res, err);
     if (!user) return res.send(404);
