@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import json2xml from 'json2xml';
 const router = express.Router(); 
 var server = null;
+import userEvent from '../../events.js';
 
 function init(serverIn) {
   server = serverIn;
@@ -105,6 +106,7 @@ router.post('/', (req, res) => {
    if (req.body.hashedPassword) {delete req.body.hashedPassword;}
   Model.User.create(req.body, function(err, user) {
     if (err) return handleError(res, err);
+    userEvent.publish('create_user_event', user);
     return res.status(201).send(convertAndFormatMongooseObjectToPlainObject(user));
   });
 });
