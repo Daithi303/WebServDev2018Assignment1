@@ -1,5 +1,7 @@
-var api_key = 'key-603755c58f8aa2b34c5cdfc79d1e3c0f';
-var domain = 'sandbox2bc537205c04440faec60f5093a3cc5b.mailgun.org';
+var dotenv = require('dotenv');
+dotenv.config();
+var api_key = process.env.mailgun_api_key;
+var domain = process.env.mailgun_domain;
 var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
 var userEvent = require('./events');
 
