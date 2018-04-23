@@ -5,9 +5,9 @@
 var PubNub = require('pubnub');
 
 var pubnub = new PubNub({
-            publishKey : 'pub-c-f35a7620-53ed-4cfa-9e67-3417e8b93212',
-            subscribeKey : 'sub-c-eaeee79c-46df-11e8-afae-2a65d00afee8',
-            secretKey: "sec-c-NmYxM2FlMmEtZTk1MC00YzI3LTllMTEtMTViODFjZTNjMWVm",
+            publishKey : 'pub-c-55a81b4c-261d-4528-bb9c-64230b45ec46',
+            subscribeKey : 'sub-c-ac3c93a2-4737-11e8-b5d4-4e74274099a3',
+            secretKey: "sec-c-NWFiOGI5NjUtOWM0Ny00ZjQwLWExYzItM2ZjNjgwODE4MjFl",
             ssl: true
 });
 
