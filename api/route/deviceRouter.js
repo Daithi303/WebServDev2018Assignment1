@@ -4,12 +4,16 @@ import _ from 'lodash';
 import jwt from 'jsonwebtoken';
 import json2xml from 'json2xml';
 const router = express.Router(); 
-var server = null;
+//var server = null;
 
+import {server} from './../../index.js';
+
+/*
 function init(serverIn) {
   server = serverIn;
 };
 
+*/
 //this function converts the plain object to an xml object
 function getDeviceInXml(deviceObj){
 			 var objId = {value: deviceObj._id.toString()};
@@ -369,6 +373,7 @@ function handleError(res, err) {
 };
 
 module.exports = {
-	router: router,
-	init: init	
+	router: router
+	//,
+//	init: init	
 };

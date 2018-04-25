@@ -1,20 +1,17 @@
 'use strict';
 // Pubnub service configuration
 // ===========================
-var dotenv = require('dotenv');
+const dotenv = require('dotenv');
 dotenv.config();
-var PubNub = require('pubnub');
-var publishKeyVal = process.env.publishKey;
-var subscribeKeyVal = process.env.subscribeKey;
-var secretKeyVal = process.env.secretKey;
-var pubnub = new PubNub({
-            publishKey : publishKeyVal,
-            subscribeKey : subscribeKeyVal,
-            secretKey: secretKeyVal,
-            ssl: true
-});
-
-
+const PubNub = require('pubnub');
+const publishKeyVal = process.env.publishKey;
+const subscribeKeyVal = process.env.subscribeKey;
+const secretKeyVal = process.env.secretKey;
+const pubnub = new PubNub({
+publishKey:publishKeyVal,
+subscribeKey:subscribeKeyVal,
+secretKey:secretKeyVal,
+ssl:true});
 
 module.exports = {
   publish: function(channel, message){

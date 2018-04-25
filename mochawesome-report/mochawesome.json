@@ -1,0 +1,82 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 1,
+    "passes": 0,
+    "pending": 0,
+    "failures": 1,
+    "start": "2018-04-25T10:42:34.175Z",
+    "end": "2018-04-25T10:42:34.278Z",
+    "duration": 103,
+    "testsRegistered": 1,
+    "passPercent": 0,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false,
+    "passPercentClass": "danger",
+    "pendingPercentClass": "danger"
+  },
+  "suites": {
+    "uuid": "a8913f26-e0e7-489b-aa9f-30eafdca84c5",
+    "title": "",
+    "fullFile": "",
+    "file": "",
+    "beforeHooks": [],
+    "afterHooks": [],
+    "tests": [],
+    "suites": [
+      {
+        "uuid": "4841566c-8420-42de-8344-2b3aa0cb940a",
+        "title": "User API unit test",
+        "fullFile": "/home/ubuntu/workspace/test/testUsersApi.js",
+        "file": "/test/testUsersApi.js",
+        "beforeHooks": [],
+        "afterHooks": [],
+        "tests": [
+          {
+            "title": "should return collection of JSON documents",
+            "fullTitle": "User API unit test should return collection of JSON documents",
+            "timedOut": false,
+            "duration": 0,
+            "state": "failed",
+            "pass": false,
+            "fail": true,
+            "pending": false,
+            "code": "// calling home page api\n(0, _supertest2.default)(_index.server).get('/api/user').expect(200) // This is the HTTP response\n.end(function (err, res) {\n  // HTTP status should be 200\n  res.status.should.equal(200);\n  done();\n});",
+            "err": {
+              "message": "AssertionError: expected 403 to be 200",
+              "estack": "AssertionError: expected 403 to be 200\n    at Assertion.fail (node_modules/should/cjs/should.js:275:17)\n    at Assertion.value (node_modules/should/cjs/should.js:356:19)\n    at Test.<anonymous> (test/testUsersApi.js:15:25)\n    at Test.assert (node_modules/supertest/lib/test.js:179:6)\n    at Server.assert (node_modules/supertest/lib/test.js:131:12)\n    at emitCloseNT (net.js:1552:8)\n    at _combinedTickCallback (internal/process/next_tick.js:77:11)\n    at process._tickCallback (internal/process/next_tick.js:104:9)",
+              "diff": "- 403\n+ 200\n"
+            },
+            "isRoot": false,
+            "uuid": "80832e5e-9ed3-4181-a009-c473603ee511",
+            "isHook": false,
+            "skipped": false
+          }
+        ],
+        "suites": [],
+        "passes": [],
+        "failures": [
+          "80832e5e-9ed3-4181-a009-c473603ee511"
+        ],
+        "pending": [],
+        "skipped": [],
+        "duration": null,
+        "root": false,
+        "rootEmpty": false,
+        "_timeout": 120000
+      }
+    ],
+    "passes": [],
+    "failures": [],
+    "pending": [],
+    "skipped": [],
+    "duration": 0,
+    "root": true,
+    "rootEmpty": true,
+    "_timeout": 2000
+  },
+  "copyrightYear": 2018
+}

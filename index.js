@@ -19,11 +19,11 @@ if (process.env.seedDb) {
 }
 
 const port = process.env.PORT;
-var server = express();
+export const server = express();
 server.set('superSecret', process.env.jwtSecret);
-userRouter.init(server);
-deviceRouter.init(server);
-authenticateRouter.init(server);
+//userRouter.init(server);
+//deviceRouter.init(server);
+//authenticateRouter.init(server);
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
 server.use('/api/authenticate', authenticateRouter.router);

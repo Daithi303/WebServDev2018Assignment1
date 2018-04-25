@@ -4,14 +4,17 @@ import _ from 'lodash';
 import jwt from 'jsonwebtoken';
 import json2xml from 'json2xml';
 const router = express.Router(); 
-var server = null;
 import userEvent from '../../events.js';
+//var server = null;
 
+import {server} from './../../index.js';
+
+/*
 function init(serverIn) {
   server = serverIn;
 };
 
-
+*/
 //this function converts the mongoose object to a plain object so the salt and hashed password properties can be removed before sending the object as a response
 function convertAndFormatMongooseObjectToPlainObject(user){
 	var userObj = user.toObject();
@@ -144,7 +147,8 @@ function handleError(res, err) {
 };
 
 module.exports = {
-	router: router,
-	init: init	
+	router: router
+	//,
+//	init: init	
 };
 

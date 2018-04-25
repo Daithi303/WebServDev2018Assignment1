@@ -3,12 +3,16 @@ import Model from './../model/model.js';
 import _ from 'lodash';
 import jwt from 'jsonwebtoken';
 const router = express.Router(); 
-var server = null;
+//var server = null;
 
+import {server} from './../../index.js';
+
+/*
 function init(serverIn) {
   server = serverIn;
 };
 
+*/
 router.post('/', (req, res) => {
 Model.User.findOne({
     userName: req.body.userName
@@ -43,6 +47,7 @@ function handleError(res, err) {
 };
 
 module.exports = {
-	router: router,
-	init: init	
+	router: router
+	//,
+	//init: init	
 };
