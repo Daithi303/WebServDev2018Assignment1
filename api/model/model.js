@@ -4,6 +4,7 @@ import crypto from 'crypto';
 const Schema = mongoose.Schema;
 import moment from 'moment';
 import arrayUniquePlugin from 'mongoose-unique-array';
+import bcrypt from  'bcrypt-nodejs';
 
 const JourneySchema = new Schema(
 {
@@ -21,7 +22,7 @@ const JourneySchema = new Schema(
 	finishDateTime: {
 		type : String, 
 		default: function(){
-			return null;rs
+			return null;
 			
 		} 
 	},
@@ -144,14 +145,10 @@ const UserSchema = new Schema({
   type: String,
   required: true
   },
-  hashedPassword: {
+  password: {
   type: String,
   required: true
   },
-  salt: {
-        type: String,
-        default: "aHNkNzM1MzkzZ2RoZDkzNzNnZWk4ZGhlOTkyODNnZGs="
-    },
 	admin: {
 		type: Boolean,
 		required: true,
@@ -159,6 +156,39 @@ const UserSchema = new Schema({
 	}
 });
 
+//////////////////////////////////////////////////////////////
+UserSchema.pre('save', function(next) {
+    const user = this;
+    if (this.isModified('password') || this.isNew) {
+        bcrypt.genSalt(10, (err, salt)=> {
+            if (err) {
+                return next(err);
+            }
+            bcrypt.hash(user.password, salt, null, (err, hash)=> {
+                if (err) {
+                    return next(err);
+                }
+                user.password = hash;
+                next();
+            });
+        });
+    } else {
+        return next();
+    }
+});
+
+UserSchema.methods.comparePassword = function(passw, cb) {
+    bcrypt.compare(passw, this.password, (err, isMatch) => {
+        if (err) {
+            return cb(err);
+        }
+        cb(null, isMatch);
+    });
+};
+//////////////////////////////////////////////////////////////
+
+
+/*
 UserSchema.virtual('password')
     .set(function (password) {
 		//this.salt = crypto.randomBytes(32).toString('base64');
@@ -176,7 +206,7 @@ UserSchema.methods.encryptPassword = function (password, salt) {
 UserSchema.methods.checkPassword = function (password) {
     return this.encryptPassword(password, this.salt) === this.hashedPassword;
 };
-
+*/
 
 UserSchema.path('email').validate(function (email) {
    var emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;

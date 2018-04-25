@@ -9,7 +9,6 @@ import mongoose from 'mongoose';
 import {loadUsers} from './api/model/userData';
 import {loadDevices} from './api/model/deviceData';
 import jwt from 'jsonwebtoken';
-
 dotenv.config();
 mongoose.connect(process.env.mongoDB);
 
@@ -19,14 +18,15 @@ if (process.env.seedDb) {
 }
 
 const port = process.env.PORT;
-export const server = express();
+var server = express();
 server.set('superSecret', process.env.jwtSecret);
-//userRouter.init(server);
+userRouter.init(server);
 //deviceRouter.init(server);
 //authenticateRouter.init(server);
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
-server.use('/api/authenticate', authenticateRouter.router);
+
+//server.use('/api/authenticate', authenticateRouter.router);
 server.use('/api/user', userRouter.router);
 server.use('/api/device', deviceRouter.router);
 

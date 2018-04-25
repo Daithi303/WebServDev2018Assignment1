@@ -10,8 +10,7 @@ const users = [
   "countyState": "County Adam",
   "email": "adam@amail.com",
   "userName": "adam101",
-  "hashedPassword": "85b412c53bb2059acef04832158b84f2736e00f8",
-  "salt": "aHNkNzM1MzkzZ2RoZDkzNzNnZWk4ZGhlOTkyODNnZGs=",
+  "password": "adamPword",
 	"admin": true
 },
     {
@@ -23,8 +22,7 @@ const users = [
   "countyState": "County Barry",
   "email": "barry@bmail.com",
   "userName": "barry101",
-  "hashedPassword": "c5c882513e18029989bf333f21a326acb98e54f2",
-  "salt": "aHNkNzM1MzkzZ2RoZDkzNzNnZWk4ZGhlOTkyODNnZGs=",
+  "password": "barryPword",
   "admin": false
 },
     {
@@ -36,8 +34,7 @@ const users = [
   "countyState": "County Claire",
   "email": "claire@cmail.com",
   "userName": "claire101",
-  "hashedPassword": "e00e291c2c91f4989423f2aa67cbe086715054b5",
-  "salt": "aHNkNzM1MzkzZ2RoZDkzNzNnZWk4ZGhlOTkyODNnZGs=",
+  "password": "clairePword",
 	"admin": true
 },
     {
@@ -49,14 +46,20 @@ const users = [
   "countyState": "County Danny",
   "email": "danny@dmail.com",
   "userName": "danny101",
-  "hashedPassword": "b39d9803499c88e27aa1ba862148e0b2d93e2c00",
-  "salt": "aHNkNzM1MzkzZ2RoZDkzNzNnZWk4ZGhlOTkyODNnZGs=",
+  "password": "dannyPword",
   "admin": false
 }
 ];
 
 export const loadUsers = () => {
   model.User.find({}).remove(() => {
+    for(var i = 0;i <users.length;i++){
+          const newUser = new model.User(users[i]);
+    // save the user
+    newUser.save();
+    console.info(`Index: ${i} user were successfully stored.`);
+    }
+    /*
     model.User.collection.insert(users, (err, docs)=>{
     if (err) {
       console.log(`failed to Load user Data: ${err}`);
@@ -64,5 +67,6 @@ export const loadUsers = () => {
       console.info(`${users.length} users were successfully stored.`);
     }
   });
+  */
 });
 };

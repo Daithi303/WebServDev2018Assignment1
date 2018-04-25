@@ -28,6 +28,7 @@ function convertAndFormatMongooseObjectToPlainObject(device){
 }
 
 //Authenticate with token
+/*
 router.use(
 function(req, res, next) {
   var token = req.headers['x-access-token'];
@@ -48,6 +49,7 @@ function(req, res, next) {
   }
 }
 );
+*/
 
 //Get a device (json and xml)
 router.get('/:deviceId', (req, res) => {

@@ -8,10 +8,10 @@ var userEvent = require('./events');
 var  messageHandler = function(m) {
          // The Payload
         var data = {
-            'from': 'WIT BSc IT <me@wit.ie>',
+            'from': 'Web Services Development API <me@wsd.ie>',
             'to': '20066109@mail.wit.ie',
             'subject': 'User Created',
-            'text': 'A user has just been creted'
+            'text': 'A user has just been registered.'
           };
 
           mailgun.messages().send(data, function (error, body) {

@@ -32,7 +32,7 @@ Model.User.findOne({
           expiresIn: 60*60*24
         });
 var superSecret = server.get('superSecret');
-        return res.json({
+        return res.status(200).json({
           success: true,
           message: 'Enjoy your token!',
           token: token

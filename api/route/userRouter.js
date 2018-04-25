@@ -2,32 +2,34 @@ import express from 'express';
 import Model from './../model/model.js';
 import _ from 'lodash';
 import jwt from 'jsonwebtoken';
+import asyncHandler from 'express-async-handler';
 import json2xml from 'json2xml';
 const router = express.Router(); 
-import userEvent from '../../events.js';
-//var server = null;
+import userEvent from './../../events.js';
+var server = null;
+import passport from './../../auth';
 
-import {server} from './../../index.js';
 
-/*
 function init(serverIn) {
   server = serverIn;
+  server.use(passport.initialize());
 };
 
-*/
 //this function converts the mongoose object to a plain object so the salt and hashed password properties can be removed before sending the object as a response
 function convertAndFormatMongooseObjectToPlainObject(user){
 	var userObj = user.toObject();
-	userObj = removeSaltAndHash(userObj);
+	//userObj = removeSaltAndHash(userObj);
 	return userObj;
 }
 
 //this function removes the salt and hashedPassword properties from the plain object
+/*
 function removeSaltAndHash(userObj){
 	delete userObj.hashedPassword;
 	delete userObj.salt;
 	return userObj;
 }
+*/
 
 //this function converts the plain object to an xml object
 function getUserInXml(userObj){
@@ -38,6 +40,7 @@ function getUserInXml(userObj){
 }
 
 //Authenticate with token
+/*
 router.use(
 function(req, res, next) {
   var token = req.headers['x-access-token'];
@@ -60,9 +63,11 @@ function(req, res, next) {
   }
 }
 );
+*/
+
 
 //Get a user (json and xml)
-router.get('/:userId', (req, res) => {
+router.get('/:userId',passport.authenticate('jwt', {session: false}), (req, res) => {
   Model.User.findById(req.params.userId, (err, user) => {
     if (err) return handleError(res, err);
 	 if (!user) return res.status(404).json({User: "Not found"});
@@ -78,7 +83,7 @@ router.get('/:userId', (req, res) => {
 });
 
 //Get all users (json and xml)
-router.get('/', (req, res) => {
+router.get('/',passport.authenticate('jwt', {session: false}), (req, res) => {
   Model.User.find((err, users) => {
     if (err) return handleError(res, err);
 	 if (!users) return res.status(404).json({Users: "Not found"});
@@ -104,20 +109,74 @@ router.get('/', (req, res) => {
 });
 
 //Add a user
+/*
 router.post('/', (req, res) => {
    if (req.body._id) delete req.body._id;
-   if (req.body.hashedPassword) {delete req.body.hashedPassword;}
+   //if (req.body.hashedPassword) {delete req.body.hashedPassword;}
   Model.User.create(req.body, function(err, user) {
     if (err) return handleError(res, err);
     userEvent.publish('create_user_event', user);
     return res.status(201).send(convertAndFormatMongooseObjectToPlainObject(user));
   });
 });
+*/
+
+//register/login a user (to replace the Add a user route)
+//////////////////////////////////////////////
+router.post('/', asyncHandler(async (req, res) => {
+  if (!req.body.userName || !req.body.password) {
+    res.json({
+      success: false,
+      msg: 'Please pass username and password.',
+    });
+  };
+  if (req.query.action === 'register') {
+    const newUser = new Model.User({
+  fName: req.body.fName,
+  lName: req.body.lName,
+  streetAddress1: req.body.streetAddress1,
+  streetAddress2: req.body.streetAddress2,
+  townCity: req.body.townCity,
+  countyState: req.body.countyState,
+  email: req.body.email,
+  userName: req.body.userName,
+  password: req.body.password,
+  admin: req.body.admin
+    });
+    // save the user
+    await newUser.save();
+    userEvent.publish('create_user_event', newUser);
+    return res.status(201).send(convertAndFormatMongooseObjectToPlainObject(newUser));
+  } else {
+    const user = await Model.User.findOne({
+      userName: req.body.userName,
+    });
+    if (!user) return res.status(401).send({success: false, msg: 'Authentication failed. User not found.'});
+    user.comparePassword(req.body.password, (err, isMatch) => {
+      if (isMatch && !err) {
+        // if user is found and password is right create a token
+        const token = jwt.sign(user.userName, process.env.jwtSecret);
+        // return the information including token as JSON
+        res.status(200).json({
+          success: true,
+          token: 'JWT ' + token,
+        });
+      } else {
+        res.status(401).send({
+          success: false,
+          msg: 'Authentication failed. Wrong password.',
+        });
+      }
+    });
+  };
+}));
+///////////////////////////////////////////////
+
 
 // Update a user
 router.put('/:userId', (req, res) => {
   if (req.body._id) delete req.body._id;
-   if (req.body.hashedPassword) {delete req.body.hashedPassword;}
+   //if (req.body.hashedPassword) {delete req.body.hashedPassword;}
   Model.User.findById(req.params.userId, (err, user) => {
     if (err) return handleError(res, err);
     if (!user) return res.send(404);
@@ -147,8 +206,7 @@ function handleError(res, err) {
 };
 
 module.exports = {
-	router: router
-	//,
-//	init: init	
+	router: router,
+  init: init	
 };
 
