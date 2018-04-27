@@ -2,14 +2,31 @@ import model from './model.js';
 
 const devices = [
     {
-	"deviceName": "device_27sgjwid",
+	"deviceName": "device0001",
 	"minTempWarning": 2,
 	"maxTempWarning": 18,
 	"minutesToWaitBeforeSecondaryAlert": 5,
-	"minutesAllowedForJourneyPause": 5
+	"minutesAllowedForJourneyPause": 5,
+	"registeredOwner":"danny101",
+	    "journey": [
+        {
+            "journeyState": "inProgress",
+            "startDateTime": "journey0001startDateTime",
+            "finishDateTime": null,
+            "initiator": "danny101",
+            "_id": "5ae2ff223d6b3c0e612260e2"
+        },
+                {
+            "journeyState": "inProgress",
+            "startDateTime": "journey0002startDateTime",
+            "finishDateTime": null,
+            "initiator": "danny101",
+            "_id": "5ae7ff223d2b3c3e612260e6"
+        }
+    ]
 },
     {
-	"deviceName": "device_18shwtd7",
+	"deviceName": "device0002",
 	"minTempWarning": 2,
 	"maxTempWarning": 18,
 	"minutesToWaitBeforeSecondaryAlert": 5,

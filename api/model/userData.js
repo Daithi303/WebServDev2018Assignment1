@@ -48,6 +48,18 @@ const users = [
   "userName": "danny101",
   "password": "dannyPword",
   "admin": false
+},
+    {
+  "fName": "Eddie",
+  "lName": "Edwards",
+  "streetAddress1": "1 eddie street",
+  "streetAddress2": "Eddie Estate",
+  "townCity": "Eddie Town",
+  "countyState": "County Eddie",
+  "email": "eddie@dmail.com",
+  "userName": "eddie101",
+  "password": "eddiePword",
+  "admin": false
 }
 ];
 
@@ -57,7 +69,7 @@ export const loadUsers = () => {
           const newUser = new model.User(users[i]);
     // save the user
     newUser.save();
-    console.info(`Index: ${i} user were successfully stored.`);
+    console.info(`Index: ${i} user was successfully stored.`);
     }
     /*
     model.User.collection.insert(users, (err, docs)=>{

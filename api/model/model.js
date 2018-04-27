@@ -9,8 +9,7 @@ import bcrypt from  'bcrypt-nodejs';
 const JourneySchema = new Schema(
 {
 	initiator: {
-		type: Schema.Types.ObjectId, 
-		ref: 'User',
+		type: String, 
 		required: true
 	},
 	startDateTime: {
@@ -36,11 +35,8 @@ const JourneySchema = new Schema(
 const DeviceSchema = new Schema({
 	deviceName: {
 		type: String,
-		default: function() {
-			var devicePrefix = "device_"
-			var deviceSuffix =  randToken.generate(8);
-			var deviceName = devicePrefix+deviceSuffix;
-		return deviceName;}
+		required: true,
+		unique: true
 	},
 	minTempWarning: {
 		type: Number,
@@ -59,54 +55,12 @@ const DeviceSchema = new Schema({
 		default:5
 	},
   registeredOwner: { 
-  type: Schema.Types.ObjectId,
-  ref: 'User'
+  type: String,
   },
 	journey: [JourneySchema]
 });
 
 var Device =  mongoose.model('Device', DeviceSchema);
-/*
-var deviceExists = function(value,respond) {
-	//console.log("Current value in deviceExists: "+ value);
-Device.findOne({_id: value}, function(err, device) {
-    if(err) throw err;
-    if(device) {
-		console.log("Device Found");
-		return respond(true);}
-	else{
-    console.log("Device NOT Found");
-    return respond(false);
-	}
-  });
-};
-
-  var deviceIsNotYetRegistered = function(value, respond) {
- User.find({registeredDevices: {_id: value} } , function(err, registeredDevice) {	
-    if(err) {console.log("Error was thrown");throw err;};
-    if(registeredDevice != null) {
-		console.log("Device already registered: " + registeredDevice);
-		return respond(false);
-    }
-	else{
-	console.log("Device NOT registered: "+ registeredDevice);
-    return respond(true);}
-	
-  }
-
-);
-};
-
-
-
-//{ validator: deviceIsNotYetRegistered, msg: 'Device is already registered' }
-//{ validator: deviceExists, msg: 'Device does not exist.' }
-var manyValidators = [
-    {
-  isAsync: true,
-  validator: deviceIsNotYetRegistered, msg: 'Device is already registered' }
-];
-*/
 
 const UserSchema = new Schema({
   fName: {
@@ -143,7 +97,8 @@ const UserSchema = new Schema({
   },
   userName: {
   type: String,
-  required: true
+  required: true,
+  unique: true
   },
   password: {
   type: String,

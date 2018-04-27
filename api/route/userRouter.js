@@ -22,15 +22,6 @@ function convertAndFormatMongooseObjectToPlainObject(user){
 	return userObj;
 }
 
-//this function removes the salt and hashedPassword properties from the plain object
-/*
-function removeSaltAndHash(userObj){
-	delete userObj.hashedPassword;
-	delete userObj.salt;
-	return userObj;
-}
-*/
-
 //this function converts the plain object to an xml object
 function getUserInXml(userObj){
 			 var objId = {value: userObj._id.toString()};
@@ -39,51 +30,24 @@ function getUserInXml(userObj){
 			return response;
 }
 
-//Authenticate with token
-/*
-router.use(
-function(req, res, next) {
-  var token = req.headers['x-access-token'];
-  if (token) {
-	  var secret = server.get('superSecret');
-    jwt.verify(token, secret, function(err, decoded) {      
-      if (err) {
-        return res.json({ success: false, message: 'Failed to authenticate token.' });   	
-      } else {
-        req.decoded = decoded;    
-        next();
-      }
-    });
-
-  } else {
-    return res.status(403).send({ 
-        success: false, 
-        message: 'No token provided.' 
-    });
-  }
-}
-);
-*/
-
-
 //Get a user (json and xml)
-router.get('/:userId',passport.authenticate('jwt', {session: false}), (req, res) => {
-  Model.User.findById(req.params.userId, (err, user) => {
+router.get('/:userId',passport.authenticate('jwt', {session: false }), (req, res) => {
+  Model.User.find({userName: req.params.userId}, (err, user) => {
     if (err) return handleError(res, err);
 	 if (!user) return res.status(404).json({User: "Not found"});
     res.format({
 		'application/xml': function(){
-			return res.status(200).send(getUserInXml(convertAndFormatMongooseObjectToPlainObject(user)));
+			return res.status(200).send(getUserInXml(convertAndFormatMongooseObjectToPlainObject(user[0])));
 		},
 		'application/json': function(){
-			return res.status(200).send(convertAndFormatMongooseObjectToPlainObject(user));
+			return res.status(200).send(convertAndFormatMongooseObjectToPlainObject(user[0]));
 		}
 	});
   });
 });
 
 //Get all users (json and xml)
-router.get('/',passport.authenticate('jwt', {session: false}), (req, res) => {
+router.get('/', passport.authenticate('jwt', {session: false }), (req, res) => {
   Model.User.find((err, users) => {
     if (err) return handleError(res, err);
 	 if (!users) return res.status(404).json({Users: "Not found"});
@@ -125,7 +89,7 @@ router.post('/', (req, res) => {
 //////////////////////////////////////////////
 router.post('/', asyncHandler(async (req, res) => {
   if (!req.body.userName || !req.body.password) {
-    res.json({
+    res.status(401).json({
       success: false,
       msg: 'Please pass username and password.',
     });
@@ -174,26 +138,25 @@ router.post('/', asyncHandler(async (req, res) => {
 
 
 // Update a user
-router.put('/:userId', (req, res) => {
+router.put('/:userId',passport.authenticate('jwt', {session: false }), (req, res) => {
   if (req.body._id) delete req.body._id;
-   //if (req.body.hashedPassword) {delete req.body.hashedPassword;}
-  Model.User.findById(req.params.userId, (err, user) => {
+  Model.User.find({userName: req.params.userId}, (err, user) => {
     if (err) return handleError(res, err);
     if (!user) return res.send(404);
-    const updated = _.merge(user, req.body);
+    const updated = _.merge(user[0], req.body);
     updated.save((err) => {
       if (err) return handleError(res, err);
-      return res.status(200).send(convertAndFormatMongooseObjectToPlainObject(user));
+      return res.status(200).send(convertAndFormatMongooseObjectToPlainObject(user[0]));
     });
   });
 });
 
 // Delete a user
-router.delete('/:userId', (req, res) => {
-  Model.User.findById(req.params.userId, (err, user) => {
+router.delete('/:userId',passport.authenticate('jwt', {session: false }), (req, res) => {
+  Model.User.find({userName: req.params.userId}, (err, user) => {
     if (err) return handleError(res, err);
     if (!user) return res.send(404);
-    user.remove(function(err) {
+    user[0].remove(function(err) {
       if (err) return handleError(res, err);
       return res.status(200).json({message: "User deleted"});
     });

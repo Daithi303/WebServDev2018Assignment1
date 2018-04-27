@@ -4,16 +4,14 @@ import _ from 'lodash';
 import jwt from 'jsonwebtoken';
 import json2xml from 'json2xml';
 const router = express.Router(); 
-//var server = null;
+var server = null;
+import passport from './../../auth';
 
-import {server} from './../../index.js';
 
-/*
 function init(serverIn) {
   server = serverIn;
+  server.use(passport.initialize());
 };
-
-*/
 //this function converts the plain object to an xml object
 function getDeviceInXml(deviceObj){
 			 var objId = {value: deviceObj._id.toString()};
@@ -27,41 +25,17 @@ function convertAndFormatMongooseObjectToPlainObject(device){
 	return deviceObj;
 }
 
-//Authenticate with token
-/*
-router.use(
-function(req, res, next) {
-  var token = req.headers['x-access-token'];
-  if (token) {
-    jwt.verify(token, server.get('superSecret'), function(err, decoded) {      
-      if (err) {
-        return res.json({ success: false, message: 'Failed to authenticate token.' });    
-      } else {
-        req.decoded = decoded;    
-        next();
-      }
-    });
-  } else {
-    return res.status(403).send({ 
-        success: false, 
-        message: 'No token provided.' 
-    });
-  }
-}
-);
-*/
-
 //Get a device (json and xml)
-router.get('/:deviceId', (req, res) => {
-  Model.Device.findById(req.params.deviceId, (err, device) => {
+router.get('/:deviceId',passport.authenticate('jwt', {session: false }), (req, res) => {
+  Model.Device.find({deviceName: req.params.deviceId}, (err, deviceArr) => {
     if (err) return handleError(res, err);
-	 if (!device) return res.status(404).json({Device: "Not found"});
+	 if (deviceArr.length==0) return res.status(404).json({Device: "Not found"});
     res.format({
 		'application/xml': function(){
-			return res.status(200).send(getDeviceInXml(convertAndFormatMongooseObjectToPlainObject(device)));
+			return res.status(200).send(getDeviceInXml(convertAndFormatMongooseObjectToPlainObject(deviceArr[0])));
 		},
 		'application/json': function(){
-			return res.status(200).send(convertAndFormatMongooseObjectToPlainObject(device));
+			return res.status(200).send(convertAndFormatMongooseObjectToPlainObject(deviceArr[0]));
 		}
 		
 	});
@@ -88,7 +62,7 @@ router.get('/:deviceId', (req, res) => {
 */
 
 //Get all devices (json and xml)
-router.get('/', (req, res) => {
+router.get('/',passport.authenticate('jwt', {session: false }), (req, res) => {
   Model.Device.find((err, devices) => {
     if (err) return handleError(res, err);
 	 if (!devices) return res.status(404).json({Devices: "Not found"});
@@ -137,7 +111,7 @@ router.get('/', (req, res) => {
 */
 
 //Add a device
-router.post('/', (req, res) => {
+router.post('/',passport.authenticate('jwt', {session: false }), (req, res) => {
   Model.Device.create(req.body, function(err, device) {
     if (err) return handleError(res, err);
     return res.status(201).send(convertAndFormatMongooseObjectToPlainObject(device));
@@ -165,23 +139,23 @@ router.put('/:deviceId/registeredOwner', (req, res) => {
 */
 
 //Register a user as the owner of a device
-router.put('/:deviceId/registeredOwner', (req, res) => {
+router.put('/:deviceId/registeredOwner',passport.authenticate('jwt', {session: false }), (req, res) => {
   if (req.body._id) delete req.body._id;
   if(!req.body.registeredOwner){
 		return res.status(400).json({registeredOwner: "Request requires a valid registeredOwner property"});
 	}
-  var queryPromise = Model.User.findById(req.body.registeredOwner).exec();
+  var queryPromise = Model.User.find({userName: req.body.registeredOwner}).exec();
   queryPromise.then(
-  function(user){
-	  if (!user) return res.status(400).json({registeredOwner: "There are no users with that object id. Cannot be registered as owner of the device"});
-	  Model.Device.findById(req.params.deviceId, (err, device) => {
+  function(userArr){
+	  if (userArr.length==0) return res.status(400).json({registeredOwner: "There are no users with that object id. Cannot be registered as owner of the device"});
+	  Model.Device.find({deviceName: req.params.deviceId}, (err, deviceArr) => {
     if (err) return handleError(res, err);
-    if (!device) return res.status(404).json({Device: "Not found"});
+    if (deviceArr.length==0) return res.status(404).json({Device: "Not found"});
 	var reqBodyRegisteredOwner = {registeredOwner: req.body.registeredOwner};
-    const updated = _.merge(device, reqBodyRegisteredOwner);
+    const updated = _.merge(deviceArr[0], reqBodyRegisteredOwner);
     updated.save((err) => {
       if (err) return handleError(res, err);
-      return res.status(200).send(convertAndFormatMongooseObjectToPlainObject(device));
+      return res.status(200).send(convertAndFormatMongooseObjectToPlainObject(deviceArr[0]));
     });
   });
 
@@ -193,33 +167,33 @@ router.put('/:deviceId/registeredOwner', (req, res) => {
 //Get a registered owner (user) of a device
 router.get('/:deviceId/registeredOwner', (req, res) => {
   
-  Model.Device.findById(req.params.deviceId, (err, device) => {
+  Model.Device.find({unserName: req.params.deviceId}, (err, deviceArr) => {
     if (err) return handleError(res, err);
-    if (!device) return res.status(404).json({Device: "Not found"});
-	if(device.registeredOwner == null){
+    if (deviceArr==0) return res.status(404).json({Device: "Not found"});
+	if(deviceArr[0].registeredOwner == null){
 		return res.status(404).json({registeredOwner: null});
 	}
-	return res.status(200).json({registeredOwner: device.registeredOwner});
+	return res.status(200).json({registeredOwner: deviceArr[0].registeredOwner});
   });
 });
 
 
 //Create a journey
-router.post('/:deviceId/journey', (req, res) => {
+router.post('/:deviceId/journey',passport.authenticate('jwt', {session: false }), (req, res) => {
         let newJourney = req.body;
         if (newJourney){
 			if(!newJourney.initiator){
 				return res.status(400).json({initiator: "Request requires a valid initiator property"});
 			}
-			var queryPromise = Model.User.findById(req.body.initiator).exec();
+			var queryPromise = Model.User.find({userName: req.body.initiator}).exec();
 			queryPromise.then(
-			function(user){
-			if (!user) return res.status(404).json({initiator: "There are no users with that object id. Journey cannot be created with the provided id"});	
-			Model.Device.findById(req.params.deviceId, (err, device) => {
+			function(userArr){
+			if (userArr.length==0) return res.status(404).json({initiator: "There are no users with that object id. Journey cannot be created with the provided id"});	
+			Model.Device.find({deviceName: req.params.deviceId}, (err, deviceArr) => {
 			 if (err) return handleError(res, err);
-			 if (!device) return res.status(404).json({Device: "Not found"});
-			device.journey.push({initiator: newJourney.initiator});
-			device.save((err,deviceReturned) => {
+			 if (deviceArr.length==0) return res.status(404).json({Device: "Not found"});
+			deviceArr[0].journey.push({initiator: newJourney.initiator});
+			deviceArr[0].save((err,deviceReturned) => {
 				if (err) return handleError(res, err);
 				res.status(201).send(deviceReturned.journey[deviceReturned.journey.length-1]);
 			}		
@@ -236,11 +210,11 @@ router.post('/:deviceId/journey', (req, res) => {
 
 //Get all journeys in a device
 router.get('/:deviceId/journey',(req, res)=>{
-			Model.Device.findById(req.params.deviceId, (err, device) => {
+			Model.Device.find({deviceName: req.params.deviceId}, (err, deviceArr) => {
 			 if (err) return handleError(res, err);
-			 if (!device) return res.status(404).json({Device: "Not found"});
+			 if (deviceArr.length==0) return res.status(404).json({Device: "Not found"});
 			 var journeyArray = [];
-			 device.journey.forEach(function(journey){
+			 deviceArr[0].journey.forEach(function(journey){
 				 journeyArray.push(convertAndFormatMongooseObjectToPlainObject(journey));
 			 });
 			 if(journeyArray.length == 0){return res.status(404).json({Journey: "Not found"});}
@@ -250,32 +224,39 @@ router.get('/:deviceId/journey',(req, res)=>{
 
 //Get a specific journey in a device
 router.get('/:deviceId/journey/:journeyId',(req, res)=>{
-			Model.Device.findById(req.params.deviceId, (err, device) => {
+			Model.Device.find({deviceName: req.params.deviceId}, (err, deviceArr) => {
 			 if (err) return handleError(res, err);
-			 if (!device) return res.status(404).json({Device: "Not found"});
+			 if (deviceArr.length==0) return res.status(404).json({Device: "Not found"});
 			 var journeyArray = [];
-			 device.journey.forEach(function(journey){
-				 if(journey._id == req.params.journeyId){
+			 deviceArr[0].journey.forEach(function(journey){
+				 if(journey.startDateTime == req.params.journeyId){
 					  journeyArray.push(convertAndFormatMongooseObjectToPlainObject(journey));
 				 }
 			 });
 			 if(journeyArray.length == 0){return res.status(404).json({Journey: "Not found"});}
-			  return res.status(200).send(journeyArray);
+			  return res.status(200).send(journeyArray[0]);
 			});	
 });
 
 // Update a journey in a device
-router.put('/:deviceId/journey/:journeyId', (req, res) => {
+router.put('/:deviceId/journey/:journeyId',passport.authenticate('jwt', {session: false }), (req, res) => {
 	if (req.body._id) delete req.body._id;
-	Model.Device.findById(req.params.deviceId,(err,device)=>{
+	Model.Device.find({deviceName: req.params.deviceId},(err,deviceArr)=>{
 			if (err) return handleError(res, err);
-	    if (!device) return res.status(404).json({Device: "Not found"});
-		let journey = device.journey.id(req.params.journeyId);
+	    if (deviceArr.length==0) return res.status(404).json({Device: "Not found"});
+	    var device = deviceArr[0];
+	    let journey = null;
+		let journeyArr = device.journey;
+		for(var i=0;i<journeyArr.length;i++){
+			if(journeyArr[i].startDateTime===req.params.journeyId){
+				journey = journeyArr[i];
+			}
+		}
 		if(!journey) return res.status(404).json({Journey: "Not found"});
 		if(!req.body.finishDateTime && !req.body.journeyState) return res.status(400).json({journey: "Request requires either a valid finishDateTime property or a journeyState property"});
 		if(req.body.finishDateTime) journey.finishDateTime = req.body.finishDateTime;
 		if(req.body.journeyState) journey.journeyState = req.body.journeyState;
-		device.save((err)=>{
+		deviceArr[0].save((err)=>{
 		if (err) {return handleError(res, err);}
 		else
 		{return  res.status(200).send(convertAndFormatMongooseObjectToPlainObject(journey));}
@@ -284,98 +265,38 @@ router.put('/:deviceId/journey/:journeyId', (req, res) => {
 	});
 
 
-// Update a journey in a device
-/*
-router.put('/:deviceId/journey/:journeyId', (req, res) => {
-	
-  if (req.body._id) delete req.body._id;
-  if (req.body.initiator) return res.status(400).json({Device: "The initiator property canot be modified after journey creation. Please remove this property from request body"});
-   if (req.body.startDateTime) return res.status(400).json({Device: "The startDateTime property canot be modified after journey creation. Please remove this property from request body"});
-  Model.Device.findById(req.params.deviceId, (err, device) => {
-    if (err) return handleError(res, err);
-     if (!device) return res.status(404).json({Device: "Not found"});
-	 var journeyIn =  req.body;
-	 var journeyFound = false;
-	device.journey.forEach(function(journey){
-	if(journey._id == req.params.journeyId){	
-		journeyFound = true;
-		journeyIn._id = req.params.journeyId;
-		if(req.params.finishDateTime){journeyIn.finishDateTime = req.params.finishDateTime;}else{journeyIn.finishDateTime = journey.finishDateTime;}
-		if(req.params.journeyState){journeyIn.journeyState = req.params.journeyState;}else{journeyIn.journeyState = journey.journeyState;}
-	device.update(
-	{'journey._id': req.params.journeyId},
-	{'$set': {
-    'journey.$.finishDateTime': journeyIn.finishDateTime,
-     'journey.$.journeyState': journeyIn.journeyState
-}},function(err) {
-	if (err) return handleError(res, err);
-	    device.save((err) => {
-      if (err) return handleError(res, err);
-      return res.status(200).json(device);
-    });
-}
-	);
-
-	}
-	});
-	if(journeyFound == false){return res.status(404).json({Journey: "Not found"});}
-  });
-});
-*/
-
-/*
-router.post('/:deviceId/journey', (req, res) => {
-        let newJourney = req.body;
-        if (newJourney){
-			Model.Device.findById(req.params.deviceId, (err, device) => {
-			 if (err) return handleError(res, err);
-			 if (!device) return res.status(404).json({Device: "Not found"});
-			device.journey.push({initiator: newJourney.initiator});
-			device.save((err,deviceReturned) => {
-				if (err) return handleError(res, err);
-				res.status(201).send(deviceReturned.journey[deviceReturned.journey.length-1]);
-			}		
-			);
-			});		          
-      }else{
-            res.status(400).send({message: "Unable to find journey in request. No journey found in body"});
-      }
-});
-*/
-
 // Update a device
-router.put('/:deviceId', (req, res) => {
+router.put('/:deviceId',passport.authenticate('jwt', {session: false }), (req, res) => {
   if (req.body._id) delete req.body._id;
   if (req.body.registeredOwner || req.body.journey) return res.status(400).json({Device: "Updates involving the registeredOwner and/or journey properties are performed through different api routes"});
-  Model.Device.findById(req.params.deviceId, (err, device) => {
+  Model.Device.find({deviceName: req.params.deviceId}, (err, deviceArr) => {
     if (err) return handleError(res, err);
-    if (!device) return res.status(404).json({Device: "Not found"});
-    const updated = _.merge(device, req.body);
+    if (deviceArr.length==0) return res.status(404).json({Device: "Not found"});
+    const updated = _.merge(deviceArr[0], req.body);
     updated.save((err) => {
       if (err) return handleError(res, err);
-      return res.status(200).json(device);
+      return res.status(200).json(deviceArr[0]);
     });
   });
 });
 
 // Delete a device
-router.delete('/:deviceId', (req, res) => {
-  Model.Device.findById(req.params.deviceId, (err, device) => {
+router.delete('/:deviceId',passport.authenticate('jwt', {session: false }), (req, res) => {
+  Model.Device.find({deviceName: req.params.deviceId}, (err, deviceArr) => {
     if (err) return handleError(res, err);
-    if (!device) return res.send(404);
-    device.remove(function(err) {
+    if (deviceArr.length==0) return res.send(404);
+    deviceArr[0].remove(function(err) {
       if (err) return handleError(res, err);
-      return res.send(204);
+      return res.status(204).send();
     });
   });
 });
 
 function handleError(res, err) {
-  return res.send(500, err);
+  return res.status(500).send(err);
 };
 
 module.exports = {
-	router: router
-	//,
-//	init: init	
+	router: router,
+	init: init	
 };
