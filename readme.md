@@ -121,42 +121,73 @@ A list of the tests that are run are as follows:
 --------------------------------------
 USER TESTS
 --------------------------------------
-should NOT register a user 
-should register a user 
-should NOT authenticate a user (a non-existing user)
-should authenticate a user 
-should NOT get all users without valid token
-should get all users with valid token
-should NOT get a specific user (barry101) with admin (adam101) token
-should get a specific user (barry101) with admin (adam101) token
-should NOT modify a specific user (barry101) without a token
-should modify a specific user (barry101) with admin (adam101) token
-should NOT modify a specific user (barry101) with another users (danny101: non-admin) token
-should modify a specific user (barry101) with the users (barry101: non-admin) token
-should NOT delete a specific user (adam101) without admin token
-should delete a specific user (adam101) with admin (adam101) token
-should NOT delete a specific user (barry101) with another users danny101) token
-should delete a specific user with the users token
+should NOT register a user.
+
+should register a user.
+
+should NOT authenticate a user (a non-existing user).
+
+should authenticate a user.
+
+should NOT get all users without valid token.
+
+should get all users with valid token.
+
+should NOT get a specific user (barry101) with admin (adam101) token.
+
+should get a specific user (barry101) with admin (adam101) token.
+
+should NOT modify a specific user (barry101) without a token.
+
+should modify a specific user (barry101) with admin (adam101) token.
+
+should NOT modify a specific user (barry101) with another users (danny101: non-admin) token.
+
+should modify a specific user (barry101) with the users (barry101: non-admin) token.
+
+should NOT delete a specific user (adam101) without admin token.
+
+should delete a specific user (adam101) with admin (adam101) token.
+
+should NOT delete a specific user (barry101) with another users danny101) token.
+
+should delete a specific user with the users token.
 --------------------------------------
 Device tests
 --------------------------------------
-should NOT get all devices without valid token
-should get all devices with admin (Claire101) token
-should NOT get a specific device (device0001) without valid token
-should get a specific device (device0001) with admin (Claire101) token
-should NOT create a device (device0003) without valid token
-should create a device (device0003) with admin (Claire101) token
-should NOT modify a device (device0003) without valid token
-should modify a device (device0003) with admin (Claire101) token
-should NOT modify a device (device0001) with non-registered owners (eddie101) token
-should modify a device (device0001) with registered owners (danny101) token
-should NOT modify a journey (journey0001) with non-registered owners (eddie101) token
-should modify a journey (journey0001) with registered owners (danny101) token
-should NOT register an owner (eddie101) with a device (device0002) without valid token
-should register an owner (eddie101) with a device (device0002) with valid token
-should NOT delete a device (device0002) without valid token
-should NOT delete a device (device0001) with non-admin (danny101) token
-should delete a device (device0002) with admin (claire101) token
+should NOT get all devices without valid token.
+
+should get all devices with admin (Claire101) token.
+
+should NOT get a specific device (device0001) without valid token.
+
+should get a specific device (device0001) with admin (Claire101) token.
+
+should NOT create a device (device0003) without valid token.
+
+should create a device (device0003) with admin (Claire101) token.
+
+should NOT modify a device (device0003) without valid token.
+
+should modify a device (device0003) with admin (Claire101) token.
+
+should NOT modify a device (device0001) with non-registered owners (eddie101) token.
+
+should modify a device (device0001) with registered owners (danny101) token.
+
+should NOT modify a journey (journey0001) with non-registered owners (eddie101) token.
+
+should modify a journey (journey0001) with registered owners (danny101) token.
+
+should NOT register an owner (eddie101) with a device (device0002) without valid token.
+
+should register an owner (eddie101) with a device (device0002) with valid token.
+
+should NOT delete a device (device0002) without valid token.
+
+should NOT delete a device (device0001) with non-admin (danny101) token.
+
+should delete a device (device0002) with admin (claire101) token.
 
 
 --- messaging ---
@@ -173,6 +204,7 @@ But for the sake of demonstation, I have coupled both services here.
 The API was initially developed on a virtual machine running on my laptop. For the second part of the assignment I moved development to the Cloud 9 cloud-based IDE.
 I was then able to set up a Heroku-based deployment environment by creating a Heroku account, then creating a new Git remote in the Heroku environment via the Heroku cli and the Git cli.
 When modifications were made to the code-base on Cloud 9 a push was made to both the origin remote as well as the new Heroku remote. 
-When this happens the code on Heroku is re-built and deployed automatically.
+When this happens the code on Heroku is re-built and deployed automatically. The URL for the heroku deployment is:
+https://web-serv-dev-2018-assignment1.herokuapp.com
 
 ADDITIONAL INFORMATION REGARDING THE FUNCTIONALITY OF THE API CAN BE FOUND IN THE GITHUB COMMIT MESSAGES.
